@@ -6,3 +6,5 @@ export const CARD_POSITIONS = [
   CARD_WIDTH,
   CARD_WIDTH * 2,
 ];
+
+export const CARD_SCALE = 0.9;
