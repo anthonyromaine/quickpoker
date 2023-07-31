@@ -4,6 +4,7 @@ import Card from "../game/Card";
 import { CARD_POSITIONS } from "../constants/CardConstants";
 
 export default class Game extends Phaser.Scene {
+  private cards!: Phaser.GameObjects.Group;
   constructor() {
     super("game");
   }
@@ -11,6 +12,11 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.initCards();
+  }
+
+  initCards() {
+    this.cards = new Phaser.GameObjects.Group(this);
     const startWidth = this.scale.width * 0.5;
 
     for (let i = 0; i < CARD_POSITIONS.length; i++) {
@@ -21,6 +27,7 @@ export default class Game extends Phaser.Scene {
         "cardback.png",
       );
       this.add.existing(newCard);
+      this.cards.add(newCard);
     }
   }
 }

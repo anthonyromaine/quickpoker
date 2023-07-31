@@ -12,4 +12,6 @@ export default class Card extends Phaser.GameObjects.Container {
 
     this.add(card);
   }
+
+  flip() {}
 }
