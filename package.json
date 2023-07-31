@@ -1,0 +1,21 @@
+{
+  "name": "poker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}"
+  },
+  "devDependencies": {
+    "prettier": "3.0.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "onchange": "^7.1.0",
+    "phaser": "^3.60.0"
+  }
+}
