@@ -4,6 +4,7 @@ import { CARD_POSITIONS } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
 
 enum GAME_STATES {
+  First,
   Init,
   Draw,
   End,
@@ -11,7 +12,7 @@ enum GAME_STATES {
 
 export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
-  public state: GAME_STATES = GAME_STATES.Init;
+  public state: GAME_STATES = GAME_STATES.First;
   public drawButton!: Phaser.GameObjects.Image;
   constructor() {
     super("game");
@@ -57,6 +58,28 @@ export default class Game extends Phaser.Scene {
   }
 
   private handleDraw() {
-    console.log(this);
+    switch (this.state) {
+      case GAME_STATES.First:
+        // Draw Cards
+        // Flip Cards
+        console.log(this);
+        (this.cards.getChildren()[0] as Card).flipUp("C8.png");
+        // Set state to Draw
+        this.state = GAME_STATES.Draw;
+        break;
+      case GAME_STATES.Init:
+        // Draw Cards
+        // Flip Cards
+        (this.cards.getChildren()[0] as Card).flip("C9.png");
+        // Set state to Draw
+        this.state = GAME_STATES.Draw;
+        break;
+      case GAME_STATES.Draw:
+        // Swap held cards with new cards
+        // Check for win
+        // Set state to Init
+        this.state = GAME_STATES.Init;
+        break;
+    }
   }
 }
