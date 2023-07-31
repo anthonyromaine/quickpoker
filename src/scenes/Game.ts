@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import Card from "../game/Card";
 import { CARD_POSITIONS } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
+import Deck from "../game/Deck";
 
 enum GAME_STATES {
   First,
@@ -14,6 +15,7 @@ export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
   public state: GAME_STATES = GAME_STATES.First;
   public drawButton!: Phaser.GameObjects.Image;
+  private deck!: Deck;
   constructor() {
     super("game");
   }
@@ -39,6 +41,8 @@ export default class Game extends Phaser.Scene {
 
     this.initCards();
     this.drawButton.on("pointerdown", this.handleDraw, this);
+    this.deck = new Deck();
+    this.deck.shuffle();
   }
 
   private initCards() {
@@ -62,15 +66,18 @@ export default class Game extends Phaser.Scene {
       case GAME_STATES.First:
         // Draw Cards
         // Flip Cards
-        console.log(this);
-        (this.cards.getChildren()[0] as Card).flipUp("C8.png");
+        for (let i = 0; i < this.cards.getChildren().length; i++) {
+          let card: Card = this.cards.getChildren()[i] as Card;
+          let newCard = this.deck.draw();
+          card.flipUp(`${newCard!.suit}${newCard!.rank}.png`);
+        }
         // Set state to Draw
         this.state = GAME_STATES.Draw;
         break;
       case GAME_STATES.Init:
         // Draw Cards
         // Flip Cards
-        (this.cards.getChildren()[0] as Card).flip("C9.png");
+
         // Set state to Draw
         this.state = GAME_STATES.Draw;
         break;
