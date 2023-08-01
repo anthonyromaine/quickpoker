@@ -34,6 +34,23 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    this.add
+      .image(
+        this.scale.width * 0.48,
+        this.scale.height * 0.9,
+        TextureKeys.Chips,
+        "RedChip.png",
+      )
+      .setScale(0.4);
+
+    this.add
+      .text(this.scale.width * 0.48, this.scale.height * 0.9, "$1", {
+        fontFamily: "Oswald",
+        fontSize: "72px",
+        color: "#000000",
+      })
+      .setOrigin(0.5);
+
     this.initCards();
     this.drawButton.on("pointerdown", this.handleDraw, this);
   }

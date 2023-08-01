@@ -11,7 +11,7 @@ export default class Poker {
       }
     }
 
-    return undefined;
+    return { hand: "No Win", amount: 0 };
   }
 
   isWin(hand: Hand, winHand: WinningHand) {
