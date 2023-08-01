@@ -1,7 +1,9 @@
+import { Rank, Suit } from "../constants/CardConstants";
+
 export default class PlayingCard {
-  rank: string;
-  suit: string;
-  constructor(suit: string, rank: string) {
+  rank: Rank;
+  suit: Suit;
+  constructor(suit: Suit, rank: Rank) {
     this.suit = suit;
     this.rank = rank;
   }

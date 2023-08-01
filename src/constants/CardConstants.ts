@@ -9,25 +9,25 @@ export const CARD_POSITIONS = [
 
 export const CARD_SCALE = 0.9;
 
-export const Suit = {
-  HEART: "H",
-  DIAMOND: "D",
-  CLUB: "C",
-  SPADE: "S",
-} as const;
+export enum Suit {
+  HEART = "H",
+  DIAMOND = "D",
+  CLUB = "C",
+  SPADE = "S",
+}
 
-export const Rank = {
-  ACE: "A",
-  KING: "K",
-  QUEEN: "Q",
-  JACK: "J",
-  TEN: "10",
-  NINE: "9",
-  EIGHT: "8",
-  SEVEN: "7",
-  SIX: "6",
-  FIVE: "5",
-  FOUR: "4",
-  THREE: "3",
-  TWO: "2",
-} as const;
+export enum Rank {
+  ACE = "A",
+  KING = "K",
+  QUEEN = "Q",
+  JACK = "J",
+  TEN = "10",
+  NINE = "9",
+  EIGHT = "8",
+  SEVEN = "7",
+  SIX = "6",
+  FIVE = "5",
+  FOUR = "4",
+  THREE = "3",
+  TWO = "2",
+}
