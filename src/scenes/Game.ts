@@ -3,17 +3,12 @@ import Card from "../game/Card";
 import { CARD_POSITIONS } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
 import Deck from "../game/Deck";
-
-enum GAME_STATES {
-  First,
-  Init,
-  Draw,
-  End,
-}
+import GameStates from "../constants/GameStates";
+import Poker from "../game/Poker";
 
 export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
-  public state: GAME_STATES = GAME_STATES.First;
+  public state: GameStates = GameStates.First;
   public drawButton!: Phaser.GameObjects.Image;
   private deck!: Deck;
   constructor() {
@@ -41,8 +36,6 @@ export default class Game extends Phaser.Scene {
 
     this.initCards();
     this.drawButton.on("pointerdown", this.handleDraw, this);
-    this.deck = new Deck();
-    this.deck.shuffle();
   }
 
   private initCards() {
@@ -63,29 +56,48 @@ export default class Game extends Phaser.Scene {
 
   private handleDraw() {
     switch (this.state) {
-      case GAME_STATES.First:
+      case GameStates.First:
+        // Get a new Deck and shuffle
+        this.deck = new Deck();
+        this.deck.shuffle();
         // Draw Cards
         // Flip Cards
         for (let i = 0; i < this.cards.getChildren().length; i++) {
           let card: Card = this.cards.getChildren()[i] as Card;
           let newCard = this.deck.draw();
+          card.reset();
           card.flipUp(`${newCard!.suit}${newCard!.rank}.png`);
         }
         // Set state to Draw
-        this.state = GAME_STATES.Draw;
+        this.state = GameStates.Draw;
         break;
-      case GAME_STATES.Init:
+      case GameStates.Init:
+        // Get a new Deck and shuffle
+        this.deck = new Deck();
+        this.deck.shuffle();
         // Draw Cards
         // Flip Cards
-
+        for (let i = 0; i < this.cards.getChildren().length; i++) {
+          let card: Card = this.cards.getChildren()[i] as Card;
+          const newCard = this.deck.draw();
+          card.reset();
+          card.flip(`${newCard!.suit}${newCard!.rank}.png`);
+        }
         // Set state to Draw
-        this.state = GAME_STATES.Draw;
+        this.state = GameStates.Draw;
         break;
-      case GAME_STATES.Draw:
-        // Swap held cards with new cards
+      case GameStates.Draw:
+        // Swap unheld cards with new cards
+        const cards = this.cards.getChildren() as Card[];
+        cards.forEach((c) => {
+          if (!c.held) {
+            const newCard = this.deck.draw();
+            c.flip(`${newCard!.suit}${newCard!.rank}.png`);
+          }
+        });
         // Check for win
         // Set state to Init
-        this.state = GAME_STATES.Init;
+        this.state = GameStates.Init;
         break;
     }
   }
