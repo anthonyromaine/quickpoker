@@ -4,13 +4,15 @@ import { CARD_POSITIONS } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
 import Deck from "../game/Deck";
 import GameStates from "../constants/GameStates";
-import Poker from "../game/Poker";
-
+import Chip from "../game/Chip";
+import { Bet, checkWin } from "../game/Poker";
+import PlayingCard from "../game/PlayingCard";
 export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
   public state: GameStates = GameStates.First;
   public drawButton!: Phaser.GameObjects.Image;
   private deck!: Deck;
+  public bet: Bet = Bet.ONE;
   constructor() {
     super("game");
   }
@@ -24,32 +26,39 @@ export default class Game extends Phaser.Scene {
         this.scale.height * 0.9,
         TextureKeys.BlueButton,
       )
-      .setScale(0.2, 0.35)
+      .setScale(0.23, 0.35)
       .setInteractive();
 
     this.add
       .text(this.scale.width * 0.8, this.scale.height * 0.895, "DRAW", {
         fontFamily: "Oswald",
-        fontSize: "72px",
+        fontSize: "64px",
       })
       .setOrigin(0.5);
 
-    this.add
+    const cashOutButton = this.add
       .image(
-        this.scale.width * 0.48,
+        this.scale.width * 0.2,
         this.scale.height * 0.9,
-        TextureKeys.Chips,
-        "RedChip.png",
+        TextureKeys.BlueButton,
       )
-      .setScale(0.4);
+      .setScale(0.23, 0.35)
+      .setInteractive();
 
     this.add
-      .text(this.scale.width * 0.48, this.scale.height * 0.9, "$1", {
+      .text(this.scale.width * 0.2, this.scale.height * 0.895, "CASH OUT", {
         fontFamily: "Oswald",
-        fontSize: "72px",
-        color: "#000000",
+        fontSize: "64px",
       })
       .setOrigin(0.5);
+
+    let chip = new Chip(
+      this,
+      this.scale.width * 0.5,
+      this.scale.height * 0.9,
+      "RedChip.png",
+    );
+    this.add.existing(chip);
 
     this.initCards();
     this.drawButton.on("pointerdown", this.handleDraw, this);
@@ -98,6 +107,8 @@ export default class Game extends Phaser.Scene {
           let card: Card = this.cards.getChildren()[i] as Card;
           const newCard = this.deck.draw();
           card.reset();
+          card.rank = newCard!.rank;
+          card.suit = newCard!.suit;
           card.flip(`${newCard!.suit}${newCard!.rank}.png`);
         }
         // Set state to Draw
@@ -109,10 +120,17 @@ export default class Game extends Phaser.Scene {
         cards.forEach((c) => {
           if (!c.held) {
             const newCard = this.deck.draw();
+            c.rank = newCard!.rank;
+            c.suit = newCard!.suit;
             c.flip(`${newCard!.suit}${newCard!.rank}.png`);
           }
         });
+
         // Check for win
+        const hand = (this.cards.getChildren() as Card[]).map((c) => {
+          return c.toPlayingCard();
+        });
+        console.log(checkWin(hand, this.bet));
         // Set state to Init
         this.state = GameStates.Init;
         break;

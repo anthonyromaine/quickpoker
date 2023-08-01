@@ -1,110 +1,108 @@
-import { Rank } from "../constants/CardConstants";
+import { Rank, Suit } from "../constants/CardConstants";
 import PlayingCard from "./PlayingCard";
 
-export default class Poker {
-  checkWin(cards: PlayingCard[], bet: Bet) {
-    const hand = new Hand(cards);
+export function checkWin(cards: PlayingCard[], bet: Bet) {
+  const hand = new Hand(cards);
 
-    for (const winHand of Object.values(WinningHand)) {
-      if (this.isWin(hand, winHand)) {
-        return { hand: winHand, amount: WinAmount[winHand][bet] };
-      }
-    }
-
-    return { hand: "No Win", amount: 0 };
-  }
-
-  isWin(hand: Hand, winHand: WinningHand) {
-    switch (winHand) {
-      case WinningHand.RoyalFlush:
-        return this.isRoyalFlush(hand);
-      case WinningHand.StraightFlush:
-        return this.isStraightFlush(hand);
-      case WinningHand.FourKind:
-        return this.isFourKind(hand);
-      case WinningHand.FullHouse:
-        return this.isFullHouse(hand);
-      case WinningHand.Flush:
-        return this.isFlush(hand);
-      case WinningHand.Straight:
-        return this.isStraight(hand);
-      case WinningHand.ThreeKind:
-        return this.isThreeKind(hand);
-      case WinningHand.TwoPair:
-        return this.isTwoPairs(hand);
-      case WinningHand.JackBetter:
-        return this.isJackBetter(hand);
+  for (const winHand of Object.values(WinningHand)) {
+    if (isWin(hand, winHand)) {
+      return { hand: winHand, amount: WinAmount[winHand][bet] };
     }
   }
 
-  isRoyalFlush(hand: Hand) {
-    return (
-      this.isFlush(hand) &&
-      hand.hasRank(Rank.ACE) &&
-      hand.hasRank(Rank.KING) &&
-      hand.hasRank(Rank.QUEEN) &&
-      hand.hasRank(Rank.JACK) &&
-      hand.hasRank(Rank.TEN)
-    );
-  }
+  return { hand: "No Win", amount: 0 };
+}
 
-  isStraightFlush(hand: Hand) {
-    return this.isFlush(hand) && this.isStraight(hand);
+function isWin(hand: Hand, winHand: WinningHand) {
+  switch (winHand) {
+    case WinningHand.RoyalFlush:
+      return isRoyalFlush(hand);
+    case WinningHand.StraightFlush:
+      return isStraightFlush(hand);
+    case WinningHand.FourKind:
+      return isFourKind(hand);
+    case WinningHand.FullHouse:
+      return isFullHouse(hand);
+    case WinningHand.Flush:
+      return isFlush(hand);
+    case WinningHand.Straight:
+      return isStraight(hand);
+    case WinningHand.ThreeKind:
+      return isThreeKind(hand);
+    case WinningHand.TwoPair:
+      return isTwoPairs(hand);
+    case WinningHand.JackBetter:
+      return isJackBetter(hand);
   }
+}
 
-  isFourKind(hand: Hand) {
-    const rankCount = hand.getRankCount();
-    return Object.values(rankCount).includes(4);
-  }
+function isRoyalFlush(hand: Hand) {
+  return (
+    isFlush(hand) &&
+    hand.hasRank(Rank.ACE) &&
+    hand.hasRank(Rank.KING) &&
+    hand.hasRank(Rank.QUEEN) &&
+    hand.hasRank(Rank.JACK) &&
+    hand.hasRank(Rank.TEN)
+  );
+}
 
-  isFullHouse(hand: Hand) {
-    const rankCount = Object.values(hand.getRankCount());
-    return rankCount.includes(3) && rankCount.includes(2);
-  }
+function isStraightFlush(hand: Hand) {
+  return isFlush(hand) && isStraight(hand);
+}
 
-  isFlush(hand: Hand) {
-    let suit = hand.cards[0].suit;
-    for (let i = 1; i < hand.cards.length; i++) {
-      if (hand.cards[i].suit !== suit) {
-        return false;
-      }
+function isFourKind(hand: Hand) {
+  const rankCount = Array.from(hand.getRankCount().values());
+  return rankCount.includes(4);
+}
+
+function isFullHouse(hand: Hand) {
+  const rankCount = Array.from(hand.getRankCount().values());
+
+  return rankCount.includes(3) && rankCount.includes(2);
+}
+
+function isFlush(hand: Hand) {
+  let suit = hand.cards[0].suit;
+  for (let i = 1; i < hand.cards.length; i++) {
+    if (hand.cards[i].suit !== suit) {
+      return false;
     }
-
-    return true;
   }
 
-  isStraight(hand: Hand) {
-    const lowestRank = hand.getLowestRank();
-    const rankOrder = Object.values(Rank).reverse();
+  return true;
+}
 
-    for (let i = 1; i <= 4; i++) {
-      if (!hand.hasRank(rankOrder[lowestRank + i])) {
-        return false;
-      }
+function isStraight(hand: Hand) {
+  const lowestRank = hand.getLowestRank();
+  const rankOrder = Object.values(Rank).reverse();
+  for (let i = 1; i <= 4; i++) {
+    if (!hand.hasRank(rankOrder[lowestRank + i])) {
+      return false;
     }
-
-    return true;
   }
 
-  isThreeKind(hand: Hand) {
-    const rankCount = hand.getRankCount();
-    return Object.values(rankCount).includes(3);
-  }
+  return true;
+}
 
-  isTwoPairs(hand: Hand) {
-    const rankCount = Object.values(hand.getRankCount());
-    return rankCount.filter((c) => c === 2).length === 2;
-  }
+function isThreeKind(hand: Hand) {
+  const rankCount = Array.from(hand.getRankCount().values());
+  return rankCount.includes(3);
+}
 
-  isJackBetter(hand: Hand) {
-    const rankCount = hand.getRankCount();
-    return (
-      rankCount.get(Rank.ACE) === 2 ||
-      rankCount.get(Rank.KING) === 2 ||
-      rankCount.get(Rank.QUEEN) === 2 ||
-      rankCount.get(Rank.JACK) === 2
-    );
-  }
+function isTwoPairs(hand: Hand) {
+  const rankCount = Array.from(hand.getRankCount().values());
+  return rankCount.filter((c) => c === 2).length === 2;
+}
+
+function isJackBetter(hand: Hand) {
+  const rankCount = hand.getRankCount();
+  return (
+    rankCount.get(Rank.ACE) === 2 ||
+    rankCount.get(Rank.KING) === 2 ||
+    rankCount.get(Rank.QUEEN) === 2 ||
+    rankCount.get(Rank.JACK) === 2
+  );
 }
 
 class Hand {
@@ -114,14 +112,14 @@ class Hand {
     this.cards = cards;
   }
 
-  hasRank(rank: string) {
+  hasRank(rank: Rank) {
     if (this.cards.find((c) => c.rank === rank)) {
       return true;
     }
     return false;
   }
 
-  hasSuit(suit: string) {
+  hasSuit(suit: Suit) {
     if (this.cards.find((c) => c.suit === suit)) {
       return true;
     }
@@ -168,12 +166,12 @@ enum WinningHand {
   JackBetter = "Jacks or Better",
 }
 
-enum Bet {
-  ONE,
-  TWO,
-  THREE,
-  FOUR,
-  FIVE,
+export enum Bet {
+  ONE = 1,
+  TWO = 2,
+  THREE = 3,
+  FOUR = 4,
+  FIVE = 5,
 }
 
 const WinAmount: Record<WinningHand, number[]> = {

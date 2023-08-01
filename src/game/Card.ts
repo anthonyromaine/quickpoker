@@ -1,12 +1,15 @@
-import { CARD_SCALE } from "../constants/CardConstants";
+import { CARD_SCALE, Rank, Suit } from "../constants/CardConstants";
 import GameStates from "../constants/GameStates";
 import TextureKeys from "../constants/TextureKeys";
 import Game from "../scenes/Game";
+import PlayingCard from "./PlayingCard";
 
 export default class Card extends Phaser.GameObjects.Container {
   private cardImage: Phaser.GameObjects.Image;
   private heldText: Phaser.GameObjects.Text;
   public held: boolean = false;
+  public suit!: Suit;
+  public rank!: Rank;
   constructor(scene: Game, x: number, y: number, startTexture: string) {
     super(scene, x, y);
 
@@ -83,5 +86,9 @@ export default class Card extends Phaser.GameObjects.Container {
       },
       onCompleteParams: [this, texture],
     });
+  }
+
+  toPlayingCard() {
+    return new PlayingCard(this.suit, this.rank);
   }
 }
