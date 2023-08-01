@@ -6,13 +6,14 @@ import Deck from "../game/Deck";
 import GameStates from "../constants/GameStates";
 import Chip from "../game/Chip";
 import { Bet, checkWin } from "../game/Poker";
-import PlayingCard from "../game/PlayingCard";
 export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
   public state: GameStates = GameStates.First;
   public drawButton!: Phaser.GameObjects.Image;
   private deck!: Deck;
   public bet: Bet = Bet.ONE;
+  private credits = 20;
+  private creditText!: Phaser.GameObjects.Text;
   constructor() {
     super("game");
   }
@@ -20,6 +21,17 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.creditText = this.add
+      .text(
+        this.scale.width * 0.77,
+        this.scale.height * 0.8,
+        `CREDITS ${this.credits}`,
+        {
+          fontFamily: "Oswald",
+          fontSize: "72px",
+        },
+      )
+      .setOrigin(0.5);
     this.drawButton = this.add
       .image(
         this.scale.width * 0.8,
@@ -83,6 +95,9 @@ export default class Game extends Phaser.Scene {
   private handleDraw() {
     switch (this.state) {
       case GameStates.First:
+        if (this.credits < this.bet) {
+          return;
+        }
         // Get a new Deck and shuffle
         this.deck = new Deck();
         this.deck.shuffle();
@@ -94,6 +109,8 @@ export default class Game extends Phaser.Scene {
           card.reset();
           card.flipUp(`${newCard!.suit}${newCard!.rank}.png`);
         }
+        // Decrease credits
+        this.updateCredits(-this.bet);
         // Set state to Draw
         this.state = GameStates.Draw;
         break;
@@ -111,10 +128,15 @@ export default class Game extends Phaser.Scene {
           card.suit = newCard!.suit;
           card.flip(`${newCard!.suit}${newCard!.rank}.png`);
         }
+        // Decrease credits
+        this.updateCredits(-this.bet);
         // Set state to Draw
         this.state = GameStates.Draw;
         break;
       case GameStates.Draw:
+        if (this.credits < this.bet) {
+          return;
+        }
         // Swap unheld cards with new cards
         const cards = this.cards.getChildren() as Card[];
         cards.forEach((c) => {
@@ -130,10 +152,17 @@ export default class Game extends Phaser.Scene {
         const hand = (this.cards.getChildren() as Card[]).map((c) => {
           return c.toPlayingCard();
         });
-        console.log(checkWin(hand, this.bet));
+        const result = checkWin(hand, this.bet);
+        console.log(result);
+        this.updateCredits(result.amount);
         // Set state to Init
         this.state = GameStates.Init;
         break;
     }
+  }
+
+  private updateCredits(amount: number) {
+    this.credits += amount;
+    this.creditText.text = `CREDITS ${this.credits}`;
   }
 }

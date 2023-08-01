@@ -174,14 +174,68 @@ export enum Bet {
   FIVE = 5,
 }
 
-const WinAmount: Record<WinningHand, number[]> = {
-  [WinningHand.RoyalFlush]: [250, 500, 750, 1000, 4000],
-  [WinningHand.StraightFlush]: [50, 100, 150, 200, 250],
-  [WinningHand.FourKind]: [25, 50, 75, 100, 125],
-  [WinningHand.FullHouse]: [9, 18, 27, 36, 45],
-  [WinningHand.Flush]: [6, 12, 18, 24, 30],
-  [WinningHand.Straight]: [4, 8, 12, 16, 20],
-  [WinningHand.ThreeKind]: [3, 6, 9, 12, 15],
-  [WinningHand.TwoPair]: [2, 4, 6, 8, 10],
-  [WinningHand.JackBetter]: [1, 2, 3, 4, 5],
+const WinAmount: Record<WinningHand, Record<Bet, number>> = {
+  [WinningHand.RoyalFlush]: {
+    [Bet.ONE]: 250,
+    [Bet.TWO]: 500,
+    [Bet.THREE]: 750,
+    [Bet.FOUR]: 1000,
+    [Bet.FIVE]: 4000,
+  },
+  [WinningHand.StraightFlush]: {
+    [Bet.ONE]: 50,
+    [Bet.TWO]: 100,
+    [Bet.THREE]: 150,
+    [Bet.FOUR]: 200,
+    [Bet.FIVE]: 250,
+  },
+  [WinningHand.FourKind]: {
+    [Bet.ONE]: 25,
+    [Bet.TWO]: 50,
+    [Bet.THREE]: 75,
+    [Bet.FOUR]: 100,
+    [Bet.FIVE]: 125,
+  },
+  [WinningHand.FullHouse]: {
+    [Bet.ONE]: 9,
+    [Bet.TWO]: 18,
+    [Bet.THREE]: 27,
+    [Bet.FOUR]: 36,
+    [Bet.FIVE]: 45,
+  },
+  [WinningHand.Flush]: {
+    [Bet.ONE]: 6,
+    [Bet.TWO]: 12,
+    [Bet.THREE]: 18,
+    [Bet.FOUR]: 24,
+    [Bet.FIVE]: 30,
+  },
+  [WinningHand.Straight]: {
+    [Bet.ONE]: 4,
+    [Bet.TWO]: 8,
+    [Bet.THREE]: 12,
+    [Bet.FOUR]: 16,
+    [Bet.FIVE]: 20,
+  },
+  [WinningHand.ThreeKind]: {
+    [Bet.ONE]: 3,
+    [Bet.TWO]: 6,
+    [Bet.THREE]: 9,
+    [Bet.FOUR]: 12,
+    [Bet.FIVE]: 15,
+  },
+  [WinningHand.TwoPair]: {
+    [Bet.ONE]: 2,
+    [Bet.TWO]: 4,
+    [Bet.THREE]: 6,
+    [Bet.FOUR]: 8,
+    [Bet.FIVE]: 10,
+  },
+  [WinningHand.JackBetter]: {
+    [Bet.ONE]: 1,
+    [Bet.TWO]: 2,
+    [Bet.THREE]: 3,
+    [Bet.FOUR]: 4,
+    [Bet.FIVE]: 5,
+  },
 };
