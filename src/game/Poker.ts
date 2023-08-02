@@ -127,7 +127,7 @@ class Hand {
   }
 
   getLowestRank() {
-    const rankOrder = Object.keys(Rank).reverse();
+    const rankOrder = Object.values(Rank).reverse();
     let minimumRank = rankOrder.indexOf(this.cards[0].rank);
 
     for (let i = 1; i < this.cards.length; i++) {

@@ -12,7 +12,7 @@ export default class Game extends Phaser.Scene {
   public drawButton!: Phaser.GameObjects.Image;
   private deck!: Deck;
   public bet: Bet = Bet.ONE;
-  private credits = 20;
+  private credits = JSON.parse(localStorage.getItem("credits") || "20");
   private creditText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
   private winHandText!: Phaser.GameObjects.Text;
@@ -195,5 +195,6 @@ export default class Game extends Phaser.Scene {
   private updateCredits(amount: number) {
     this.credits += amount;
     this.creditText.text = `CREDITS ${this.credits}`;
+    localStorage.setItem("credits", JSON.stringify(this.credits));
   }
 }
