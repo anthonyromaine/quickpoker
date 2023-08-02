@@ -1,11 +1,15 @@
 import Phaser from "phaser";
 import Card from "../game/Card";
-import { CARD_POSITIONS } from "../constants/CardConstants";
+import { CARD_POSITIONS, Rank, Suit } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
 import Deck from "../game/Deck";
 import GameStates from "../constants/GameStates";
 import Chip from "../game/Chip";
 import { Bet, checkWin } from "../game/Poker";
+import PlayingCard from "../game/PlayingCard";
+
+const TEXT_SIZE = "48px";
+const SCORE_TEXT_OFFSET = 70;
 export default class Game extends Phaser.Scene {
   private cards!: Phaser.GameObjects.Group;
   public state: GameStates = GameStates.First;
@@ -14,7 +18,9 @@ export default class Game extends Phaser.Scene {
   public bet: Bet = Bet.ONE;
   private credits = JSON.parse(localStorage.getItem("credits") || "20");
   private creditText!: Phaser.GameObjects.Text;
+  private highScoreText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
+  private playAgainText!: Phaser.GameObjects.Text;
   private winHandText!: Phaser.GameObjects.Text;
 
   constructor() {
@@ -24,64 +30,98 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
+    // credit text
+    this.add
+      .text(20, 10, `CREDITS`, {
+        fontFamily: "Oswald",
+        fontSize: TEXT_SIZE,
+      })
+      .setOrigin(0);
     this.creditText = this.add
+      .text(20, SCORE_TEXT_OFFSET, this.credits, {
+        fontFamily: "Oswald",
+        fontSize: TEXT_SIZE,
+      })
+      .setOrigin(0);
+    // high score text
+    this.add
+      .text(this.scale.width - 20, 10, "HIGH SCORE", {
+        fontFamily: "Oswald",
+        fontSize: TEXT_SIZE,
+      })
+      .setOrigin(1, 0);
+    this.highScoreText = this.add
       .text(
-        this.scale.width * 0.77,
-        this.scale.height * 0.8,
-        `CREDITS ${this.credits}`,
+        this.scale.width - 20,
+        SCORE_TEXT_OFFSET,
+        `${localStorage.getItem("high-score") || 0}`,
         {
           fontFamily: "Oswald",
-          fontSize: "72px",
+          fontSize: TEXT_SIZE,
+        },
+      )
+      .setOrigin(1, 0);
+    // win text
+    this.winText = this.add
+      .text(40, this.scale.height * 0.83, "", {
+        fontFamily: "Oswald",
+        fontSize: TEXT_SIZE,
+      })
+      .setOrigin(0, 0.5);
+    // win hand text (shows the winning hand name)
+    this.winHandText = this.add
+      .text(this.scale.width * 0.5, this.scale.height * 0.3, "", {
+        fontFamily: "Oswald",
+        fontSize: TEXT_SIZE,
+      })
+      .setOrigin(0.5);
+
+    // play again text
+    this.playAgainText = this.add
+      .text(
+        this.scale.width * 0.5,
+        this.scale.height * 0.6,
+        `PLAY ${this.bet} CREDIT(S)`,
+        {
+          fontFamily: "Oswald",
+          fontSize: TEXT_SIZE,
         },
       )
       .setOrigin(0.5);
 
-    this.winText = this.add
-      .text(this.scale.width * 0.155, this.scale.height * 0.8, "", {
-        fontFamily: "Oswald",
-        fontSize: "72px",
-      })
-      .setOrigin(0.5);
-
-    this.winHandText = this.add
-      .text(this.scale.width * 0.5, this.scale.height * 0.39, "", {
-        fontFamily: "Oswald",
-        fontSize: "72px",
-      })
-      .setOrigin(0.5);
-
+    // draw button
     this.drawButton = this.add
       .image(
         this.scale.width * 0.8,
         this.scale.height * 0.9,
         TextureKeys.BlueButton,
       )
-      .setScale(0.23, 0.35)
+      .setScale(0.19, 0.35)
       .setInteractive();
-
+    // draw button text
     this.add
       .text(this.scale.width * 0.8, this.scale.height * 0.895, "DRAW", {
         fontFamily: "Oswald",
-        fontSize: "64px",
+        fontSize: TEXT_SIZE,
       })
       .setOrigin(0.5);
-
+    // cash out button
     const cashOutButton = this.add
       .image(
         this.scale.width * 0.2,
         this.scale.height * 0.9,
-        TextureKeys.BlueButton,
+        TextureKeys.OrangeButton,
       )
-      .setScale(0.23, 0.35)
+      .setScale(0.19, 0.35)
       .setInteractive();
-
+    // cash out button text
     this.add
       .text(this.scale.width * 0.2, this.scale.height * 0.895, "CASH OUT", {
         fontFamily: "Oswald",
-        fontSize: "64px",
+        fontSize: TEXT_SIZE,
       })
       .setOrigin(0.5);
-
+    // chip
     let chip = new Chip(
       this,
       this.scale.width * 0.5,
@@ -102,7 +142,7 @@ export default class Game extends Phaser.Scene {
       let newCard = new Card(
         this,
         startWidth + CARD_POSITIONS[i],
-        this.scale.height * 0.5,
+        this.scale.height * 0.4,
         "cardback.png",
       );
       this.add.existing(newCard);
@@ -119,6 +159,8 @@ export default class Game extends Phaser.Scene {
         // reset win text
         this.winText.text = "";
         this.winHandText.text = "";
+        // reset play again text
+        this.playAgainText.text = "";
         // Get a new Deck and shuffle
         this.deck = new Deck();
         this.deck.shuffle();
@@ -144,6 +186,8 @@ export default class Game extends Phaser.Scene {
         // reset win text
         this.winText.text = "";
         this.winHandText.text = "";
+        // reset play again text
+        this.playAgainText.text = "";
         // Get a new Deck and shuffle
         this.deck = new Deck();
         this.deck.shuffle();
@@ -186,6 +230,8 @@ export default class Game extends Phaser.Scene {
         }
         // update credits
         this.updateCredits(result.amount);
+        // show play again text
+        this.playAgainText.text = `PLAY ${this.bet} CREDIT(S)`;
         // Set state to Init
         this.state = GameStates.Init;
         break;
@@ -194,7 +240,7 @@ export default class Game extends Phaser.Scene {
 
   private updateCredits(amount: number) {
     this.credits += amount;
-    this.creditText.text = `CREDITS ${this.credits}`;
+    this.creditText.text = this.credits;
     localStorage.setItem("credits", JSON.stringify(this.credits));
   }
 }

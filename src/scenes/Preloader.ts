@@ -9,6 +9,7 @@ export default class Preloader extends Phaser.Scene {
 
   preload() {
     this.load.image(TextureKeys.BlueButton, "game/BlueButton.png");
+    this.load.image(TextureKeys.OrangeButton, "game/OrangeButton.png");
     this.load.atlas(TextureKeys.Cards, "game/cards.png", "game/cards.json");
     this.load.atlas(TextureKeys.Chips, "game/chips.png", "game/chips.json");
     this.add.text(0, 0, "A", {
