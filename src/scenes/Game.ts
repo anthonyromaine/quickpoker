@@ -14,6 +14,9 @@ export default class Game extends Phaser.Scene {
   public bet: Bet = Bet.ONE;
   private credits = 20;
   private creditText!: Phaser.GameObjects.Text;
+  private winText!: Phaser.GameObjects.Text;
+  private winHandText!: Phaser.GameObjects.Text;
+
   constructor() {
     super("game");
   }
@@ -32,6 +35,21 @@ export default class Game extends Phaser.Scene {
         },
       )
       .setOrigin(0.5);
+
+    this.winText = this.add
+      .text(this.scale.width * 0.155, this.scale.height * 0.8, "", {
+        fontFamily: "Oswald",
+        fontSize: "72px",
+      })
+      .setOrigin(0.5);
+
+    this.winHandText = this.add
+      .text(this.scale.width * 0.5, this.scale.height * 0.39, "", {
+        fontFamily: "Oswald",
+        fontSize: "72px",
+      })
+      .setOrigin(0.5);
+
     this.drawButton = this.add
       .image(
         this.scale.width * 0.8,
@@ -98,6 +116,9 @@ export default class Game extends Phaser.Scene {
         if (this.credits < this.bet) {
           return;
         }
+        // reset win text
+        this.winText.text = "";
+        this.winHandText.text = "";
         // Get a new Deck and shuffle
         this.deck = new Deck();
         this.deck.shuffle();
@@ -107,6 +128,8 @@ export default class Game extends Phaser.Scene {
           let card: Card = this.cards.getChildren()[i] as Card;
           let newCard = this.deck.draw();
           card.reset();
+          card.rank = newCard!.rank;
+          card.suit = newCard!.suit;
           card.flipUp(`${newCard!.suit}${newCard!.rank}.png`);
         }
         // Decrease credits
@@ -115,6 +138,12 @@ export default class Game extends Phaser.Scene {
         this.state = GameStates.Draw;
         break;
       case GameStates.Init:
+        if (this.credits < this.bet) {
+          return;
+        }
+        // reset win text
+        this.winText.text = "";
+        this.winHandText.text = "";
         // Get a new Deck and shuffle
         this.deck = new Deck();
         this.deck.shuffle();
@@ -134,9 +163,6 @@ export default class Game extends Phaser.Scene {
         this.state = GameStates.Draw;
         break;
       case GameStates.Draw:
-        if (this.credits < this.bet) {
-          return;
-        }
         // Swap unheld cards with new cards
         const cards = this.cards.getChildren() as Card[];
         cards.forEach((c) => {
@@ -153,7 +179,12 @@ export default class Game extends Phaser.Scene {
           return c.toPlayingCard();
         });
         const result = checkWin(hand, this.bet);
-        console.log(result);
+        // update and show win text
+        if (result.amount > 0) {
+          this.winText.text = `WIN ${result.amount}!`;
+          this.winHandText.text = `${result.hand}!`;
+        }
+        // update credits
         this.updateCredits(result.amount);
         // Set state to Init
         this.state = GameStates.Init;
