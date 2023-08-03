@@ -23,7 +23,6 @@ export default class Game extends Phaser.Scene {
     localStorage.getItem(LocalStorageKeys.CREDITS) || "20",
   );
   private creditText!: Phaser.GameObjects.Text;
-  private highScoreText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
   private playAgainText!: Phaser.GameObjects.Text;
   private winHandText!: Phaser.GameObjects.Text;
@@ -57,7 +56,7 @@ export default class Game extends Phaser.Scene {
         fontSize: TEXT_SIZE,
       })
       .setOrigin(1, 0);
-    this.highScoreText = this.add
+    this.add
       .text(
         this.scale.width - 20,
         SCORE_TEXT_OFFSET,
