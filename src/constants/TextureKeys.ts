@@ -3,6 +3,7 @@ enum TextureKeys {
   Chips = "chips",
   BlueButton = "blue-button",
   OrangeButton = "orange-button",
+  UICard = "ui-card",
 }
 
 export default TextureKeys;

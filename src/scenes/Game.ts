@@ -7,6 +7,8 @@ import GameStates from "../constants/GameStates";
 import Chip from "../game/Chip";
 import { Bet, checkWin } from "../game/Poker";
 import PlayingCard from "../game/PlayingCard";
+import ChipScreen from "../game/ChipScreen";
+import { ChipKeys } from "../constants/ChipConstants";
 
 const TEXT_SIZE = "48px";
 const SCORE_TEXT_OFFSET = 70;
@@ -126,11 +128,17 @@ export default class Game extends Phaser.Scene {
       this,
       this.scale.width * 0.5,
       this.scale.height * 0.9,
-      "RedChip.png",
+      ChipKeys.RED,
     );
     this.add.existing(chip);
 
+    const chipScreen = new ChipScreen(
+      this,
+      this.scale.width * 0.5,
+      this.scale.height * 0.5,
+    );
     this.initCards();
+    this.add.existing(chipScreen);
     this.drawButton.on("pointerdown", this.handleDraw, this);
   }
 
