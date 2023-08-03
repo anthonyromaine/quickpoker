@@ -284,6 +284,7 @@ export default class Game extends Phaser.Scene {
 
   setBet(chip: ChipKeys) {
     this.bet = ChipValues[chip];
+    this.playAgainText.text = `PLAY ${this.bet} CREDIT(S)`;
     this.setBetChip(chip);
     this.chipScreen.setVisible(false);
   }
