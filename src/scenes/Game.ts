@@ -1,14 +1,15 @@
 import Phaser from "phaser";
 import Card from "../game/Card";
-import { CARD_POSITIONS, Rank, Suit } from "../constants/CardConstants";
+import { CARD_POSITIONS } from "../constants/CardConstants";
 import TextureKeys from "../constants/TextureKeys";
 import Deck from "../game/Deck";
 import GameStates from "../constants/GameStates";
 import Chip from "../game/Chip";
 import { Bet, checkWin } from "../game/Poker";
-import PlayingCard from "../game/PlayingCard";
 import ChipScreen from "../game/ChipScreen";
 import { ChipKeys, ChipValues } from "../constants/ChipConstants";
+import SceneKeys from "../constants/SceneKeys";
+import LocalStorageKeys from "../constants/LocalStorageKeys";
 
 const TEXT_SIZE = "48px";
 const SCORE_TEXT_OFFSET = 70;
@@ -18,7 +19,9 @@ export default class Game extends Phaser.Scene {
   public drawButton!: Phaser.GameObjects.Image;
   private deck!: Deck;
   public bet: Bet = Bet.ONE;
-  private credits = JSON.parse(localStorage.getItem("credits") || "20");
+  private credits = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.CREDITS) || "20",
+  );
   private creditText!: Phaser.GameObjects.Text;
   private highScoreText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
@@ -58,7 +61,7 @@ export default class Game extends Phaser.Scene {
       .text(
         this.scale.width - 20,
         SCORE_TEXT_OFFSET,
-        `${localStorage.getItem("high-score") || 0}`,
+        `${localStorage.getItem(LocalStorageKeys.HIGH_SCORE) || 0}`,
         {
           fontFamily: "Oswald",
           fontSize: TEXT_SIZE,
@@ -118,6 +121,7 @@ export default class Game extends Phaser.Scene {
       )
       .setScale(0.19, 0.35)
       .setInteractive();
+
     // cash out button text
     this.add
       .text(this.scale.width * 0.2, this.scale.height * 0.895, "CASH OUT", {
@@ -128,14 +132,23 @@ export default class Game extends Phaser.Scene {
     // chip
     this.setBetChip(ChipKeys.WHITE);
 
+    // create cards
+    this.initCards();
+
+    // create chip screen and hide it
     this.chipScreen = new ChipScreen(
       this,
       this.scale.width * 0.5,
       this.scale.height * 0.5,
-    );
-    this.initCards();
+    ).setVisible(false);
+
     this.add.existing(this.chipScreen);
+
+    // create drawbutton listener
     this.drawButton.on("pointerdown", this.handleDraw, this);
+    cashOutButton.on("pointerdown", () => {
+      this.scene.start(SceneKeys.GameOver, { score: this.credits });
+    });
   }
 
   private initCards() {
@@ -244,8 +257,19 @@ export default class Game extends Phaser.Scene {
         this.updateCredits(result.amount);
         // show play again text
         this.playAgainText.text = `PLAY ${this.bet} CREDIT(S)`;
-        // Set state to Init
-        this.state = GameStates.Init;
+
+        // check if player has lost
+        if (this.credits === 0) {
+          this.time.addEvent({
+            delay: 2000,
+            callback: () => {
+              this.scene.start(SceneKeys.GameOver, { score: this.credits });
+            },
+          });
+        } else {
+          // Set state to Init
+          this.state = GameStates.Init;
+        }
         break;
     }
   }
@@ -253,7 +277,10 @@ export default class Game extends Phaser.Scene {
   private updateCredits(amount: number) {
     this.credits += amount;
     this.creditText.text = this.credits;
-    localStorage.setItem("credits", JSON.stringify(this.credits));
+    localStorage.setItem(
+      LocalStorageKeys.CREDITS,
+      JSON.stringify(this.credits),
+    );
   }
 
   setBet(chip: ChipKeys) {
