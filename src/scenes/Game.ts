@@ -8,7 +8,7 @@ import Chip from "../game/Chip";
 import { Bet, checkWin } from "../game/Poker";
 import PlayingCard from "../game/PlayingCard";
 import ChipScreen from "../game/ChipScreen";
-import { ChipKeys } from "../constants/ChipConstants";
+import { ChipKeys, ChipValues } from "../constants/ChipConstants";
 
 const TEXT_SIZE = "48px";
 const SCORE_TEXT_OFFSET = 70;
@@ -24,6 +24,8 @@ export default class Game extends Phaser.Scene {
   private winText!: Phaser.GameObjects.Text;
   private playAgainText!: Phaser.GameObjects.Text;
   private winHandText!: Phaser.GameObjects.Text;
+  private chip!: Chip;
+  private chipScreen!: Phaser.GameObjects.Container;
 
   constructor() {
     super("game");
@@ -124,21 +126,15 @@ export default class Game extends Phaser.Scene {
       })
       .setOrigin(0.5);
     // chip
-    let chip = new Chip(
-      this,
-      this.scale.width * 0.5,
-      this.scale.height * 0.9,
-      ChipKeys.RED,
-    );
-    this.add.existing(chip);
+    this.setBetChip(ChipKeys.WHITE);
 
-    const chipScreen = new ChipScreen(
+    this.chipScreen = new ChipScreen(
       this,
       this.scale.width * 0.5,
       this.scale.height * 0.5,
     );
     this.initCards();
-    this.add.existing(chipScreen);
+    this.add.existing(this.chipScreen);
     this.drawButton.on("pointerdown", this.handleDraw, this);
   }
 
@@ -162,6 +158,10 @@ export default class Game extends Phaser.Scene {
     switch (this.state) {
       case GameStates.First:
         if (this.credits < this.bet) {
+          return;
+        }
+        // make sure that chipscreen is not visible
+        if (this.chipScreen.visible) {
           return;
         }
         // reset win text
@@ -189,6 +189,10 @@ export default class Game extends Phaser.Scene {
         break;
       case GameStates.Init:
         if (this.credits < this.bet) {
+          return;
+        }
+        // make sure that chipscreen is not visible
+        if (this.chipScreen.visible) {
           return;
         }
         // reset win text
@@ -250,5 +254,30 @@ export default class Game extends Phaser.Scene {
     this.credits += amount;
     this.creditText.text = this.credits;
     localStorage.setItem("credits", JSON.stringify(this.credits));
+  }
+
+  setBet(chip: ChipKeys) {
+    this.bet = ChipValues[chip];
+    this.setBetChip(chip);
+    this.chipScreen.setVisible(false);
+  }
+
+  setBetChip(chip: ChipKeys) {
+    const oldChip = this.chip;
+    this.chip = new Chip(
+      this,
+      this.scale.width * 0.5,
+      this.scale.height * 0.9,
+      chip,
+    );
+    this.add.existing(this.chip);
+    this.chip.setInteractive();
+    this.chip.on("pointerdown", () => {
+      if (this.state !== GameStates.Draw) {
+        this.chipScreen.setVisible(true);
+      }
+    });
+    oldChip?.destroy(true);
+    console.log(this);
   }
 }

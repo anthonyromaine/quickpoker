@@ -25,6 +25,7 @@ export default class Chip extends Phaser.GameObjects.Container {
 
     this.add(chip);
     this.add(chipText);
+    this.setSize(chip.displayWidth, chip.displayHeight);
   }
 
   getTexture() {
