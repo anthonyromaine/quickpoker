@@ -265,10 +265,10 @@ export default class Game extends Phaser.Scene {
               this.scene.start(SceneKeys.GameOver, { score: this.credits });
             },
           });
-        } else {
-          // Set state to Init
-          this.state = GameStates.Init;
         }
+
+        // Set state to Init
+        this.state = GameStates.Init;
         break;
     }
   }
